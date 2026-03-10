@@ -91,3 +91,25 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         print("Bot to'xtatildi! 🛑")
+import os
+from aiohttp import web
+
+async def handle(request):
+    return web.Response(text="Bot is running!")
+
+app = web.Application()
+app.router.add_get('/', handle)
+
+if __name__ == "__main__":
+    # Botni ishga tushirish bilan birga kichik veb-serverni ham yoqamiz
+    import asyncio
+    port = int(os.environ.get("PORT", 8080))
+    runner = web.AppRunner(app)
+    
+    async def main():
+        await runner.setup()
+        site = web.TCPSite(runner, '0.0.0.0', port)
+        await site.start()
+        await dp.start_polling(bot)
+
+    asyncio.run(main())
