@@ -6,7 +6,7 @@ from aiogram.filters import Command
 from groq import Groq
 from aiohttp import web
 
-API KALITLAR
+
 TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub90IR54Yw"
 GROQ_API_KEY = "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"
 
@@ -51,5 +51,6 @@ await site.start()
 
 if name == "main":
 asyncio.run(main())
+
 
 
