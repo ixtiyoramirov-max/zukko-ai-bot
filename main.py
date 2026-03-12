@@ -1,4 +1,3 @@
-
 import os
 import asyncio
 from aiogram import Bot, Dispatcher, types
@@ -18,7 +17,7 @@ return web.Response(text="Bot is live!")
 
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
-await message.answer("Salom! Men Zukko AI repetitorman. Savolingizni bering!")
+await message.answer("Salom! Men Zukko AI repetitorman. Savolingizni bering! 🚀")
 
 @dp.message()
 async def ai_handler(message: types.Message):
@@ -32,7 +31,8 @@ messages=[
 )
 await message.answer(response.choices[0].message.content)
 except Exception as e:
-await message.answer("Xatolik yuz berdi. Birozdan so'ng qayta urinib ko'ring.")
+print(f"Xato: {e}")
+await message.answer("Texnik nosozlik yuz berdi. Birozdan so'ng qayta urinib ko'ring.")
 
 async def main():
 app = web.Application()
@@ -47,4 +47,3 @@ await dp.start_polling(bot)
 
 if name == "main":
 asyncio.run(main())
-
