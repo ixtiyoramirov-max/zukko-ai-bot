@@ -25,7 +25,7 @@ async def ai_handler(message: types.Message):
     try:
         # Model nomini soddaroq variantga o'zgartirdik
         response = client.chat.completions.create(
-            model="llama3-8b-8192", 
+            model="llama3-8b-8192" 
             messages=[{"role": "user", "content": message.text}],
         )
         await message.answer(response.choices[0].message.content)
@@ -47,6 +47,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
