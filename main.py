@@ -15,10 +15,6 @@ client = Groq(api_key=GROQ_API_KEY)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-
-async def handle(request):
-return web.Response(text="Bot is live!")
-
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
 await message.answer("Salom! Men Zukko AI repetitorman. Savolingizni bering! 🚀")
@@ -51,6 +47,7 @@ await site.start()
 
 if name == "main":
 asyncio.run(main())
+
 
 
 
