@@ -23,15 +23,17 @@ async def start_handler(message: types.Message):
 @dp.message()
 async def ai_handler(message: types.Message):
     try:
-        # Model nomini soddaroq variantga o'zgartirdik
         response = client.chat.completions.create(
-            model="llama3-8b-8192" 
-            messages=[{"role": "user", "content": message.text}],
+            model="llama3-8b-8192",
+            messages=[
+                {"role": "system", "content": "Siz zukko AI repetitorsiz. O'zbek tilida javob bering."},
+                {"role": "user", "content": message.text}
+            ]
         )
         await message.answer(response.choices[0].message.content)
     except Exception as e:
-        # Xatoni aniq ko'rsatish
-        await message.answer(f"Xato: {str(e)[:50]}...")
+        print(f"Xato yuz berdi: {e}")
+        await message.answer(f"Texnik nosozlik: {str(e)[:50]}...")
 
 async def main():
     app = web.Application()
@@ -47,6 +49,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
