@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from groq import Groq
 from aiohttp import web
 
-# API KALITLAR (O'zgaruvchilardan oladi)
+# API KALITLAR
 TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub90IR54Yw"
 GROQ_API_KEY = "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"
 
@@ -13,46 +13,41 @@ client = Groq(api_key=GROQ_API_KEY)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# RENDER UCHUN ODDIY VEB-SERVER (BOTNI "LIVE" SAQLASH UCHUN)
 async def handle(request):
-    return web.Response(text="Bot is live and running!")
-
-async def start_web_server():
-    app = web.Application()
-    app.router.add_get('/', handle)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    port = int(os.environ.get("PORT", 8080))
-    site = web.TCPSite(runner, '0.0.0.0', port)
-    await site.start()
+    return web.Response(text="Bot is live!")
 
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
-    await message.answer("Salom! Men Zukko AI repetitorman. Qanday yordam bera olaman?")
+    await message.answer("Salom! Men hozir ishga tushdim. Savol bering!")
 
 @dp.message()
 async def ai_handler(message: types.Message):
     try:
+        # Model nomini soddaroq variantga o'zgartirdik
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "Siz zukko AI repetitorsiz. O'zbek tilida javob bering."},
-                {"role": "user", "content": message.text},
-            ],
+            model="llama3-8b-8192", 
+            messages=[{"role": "user", "content": message.text}],
         )
-        # Faqat javob muvaffaqiyatli bo'lsa xabar yuboramiz
         await message.answer(response.choices[0].message.content)
     except Exception as e:
-        print(f"Xato yuz berdi: {e}")
-        await message.answer("Hozircha javob bera olmayman, texnik nosozlik yuz berdi.")
+        # Xatoni aniq ko'rsatish
+        await message.answer(f"Xato: {str(e)[:50]}...")
 
 async def main():
-    # Veb-serverni va botni bir vaqtda ishga tushiramiz
-    await start_web_server()
+    app = web.Application()
+    app.router.add_get('/', handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', int(os.environ.get("PORT", 8080)))
+    await site.start()
+    
+    # Eski ulanishlarni tozalash
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
