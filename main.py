@@ -1,8 +1,4 @@
-Tushundim, kod bloklari sizga ko'rinmayotgan bo'lsa, keling, boshqacha yo'l tutamiz. Men kodni hozir oddiy matn sifatida, qator-qator qilib yozib beraman.
 
-Buni GitHub'dagi main.py ichiga joylashtirayotganingizda, tepasida yoki pastida hech qanday ortiqcha gap (masalan, "mana kod" yoki emojilar) qolib ketmasligiga juda ehtiyot bo'ling.
-
-🛠 main.py uchun toza kod (Shuni hammasini ko'chirib oling):
 import os
 import asyncio
 from aiogram import Bot, Dispatcher, types
@@ -51,3 +47,4 @@ await dp.start_polling(bot)
 
 if name == "main":
 asyncio.run(main())
+
