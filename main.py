@@ -23,7 +23,7 @@ async def start_handler(message: types.Message):
 @dp.message()
 async def ai_handler(message: types.Message):
     try:
-        # Eng barqaror model nomi: llama3-8b-8192
+        # Model nomini llama3-8b-8192 qilib o'zgartirdik
         response = client.chat.completions.create(
             model="llama3-8b-8192",
             messages=[
@@ -31,6 +31,10 @@ async def ai_handler(message: types.Message):
                 {"role": "user", "content": message.text}
             ]
         )
+        await message.answer(response.choices[0].message.content)
+    except Exception as e:
+        print(f"Xato yuz berdi: {e}")
+        await message.answer(f"Texnik nosozlik yuz berdi. Iltimos, keyinroq urinib ko'ring.")
         # Faqat javob bo'lsagina xabar yuboramiz
         if response.choices[0].message.content:
             await message.answer(response.choices[0].message.content)
@@ -55,4 +59,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
