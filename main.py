@@ -6,7 +6,7 @@ from groq import Groq
 from aiohttp import web
 
 # API KALITLAR
-TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub9OIR54Yw"
+TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub90IR54Yw"
 GROQ_API_KEY = "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"
 
 client = Groq(api_key=GROQ_API_KEY)
@@ -14,7 +14,7 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 async def handle(request):
-    return web.Response(text="Bot is live!")
+    return web.Response(text="Bot is live and running!")
 
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
@@ -23,6 +23,7 @@ async def start_handler(message: types.Message):
 @dp.message()
 async def ai_handler(message: types.Message):
     try:
+        # Eng barqaror model nomi: llama3-8b-8192
         response = client.chat.completions.create(
             model="llama3-8b-8192",
             messages=[
@@ -30,29 +31,27 @@ async def ai_handler(message: types.Message):
                 {"role": "user", "content": message.text}
             ]
         )
-        await message.answer(response.choices[0].message.content)
+        # Faqat javob bo'lsagina xabar yuboramiz
+        if response.choices[0].message.content:
+            await message.answer(response.choices[0].message.content)
     except Exception as e:
         print(f"Xato yuz berdi: {e}")
-        await message.answer(f"Texnik nosozlik: {str(e)[:50]}...")
+        await message.answer(f"Xato: {str(e)[:50]}...")
 
 async def main():
     app = web.Application()
     app.router.add_get('/', handle)
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', int(os.environ.get("PORT", 8080)))
+    
+    # Render uchun port sozlamasi
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
     
-    # Eski ulanishlarni tozalash
+    # Eskidan qolib ketgan xabarlarni tozalash
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
-
-
-
-
