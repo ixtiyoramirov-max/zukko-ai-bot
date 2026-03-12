@@ -7,7 +7,7 @@ from aiohttp import web
 
 # API KALITLAR (O'zgaruvchilardan oladi)
 TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub90IR54Yw"
-GROQ_API_KEY = "gsk_4Jr2tIFODIMX8z8ZSYoVW Gdyb3FYmccbei8cgbx0i8CR3L7iCLLn"
+GROQ_API_KEY = "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"
 
 client = Groq(api_key=GROQ_API_KEY)
 bot = Bot(token=TOKEN)
@@ -48,4 +48,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
