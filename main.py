@@ -1,4 +1,4 @@
-📄 main.py uchun to'liq kod:
+
 import os
 import asyncio
 from aiogram import Bot, Dispatcher, types
@@ -51,3 +51,4 @@ await site.start()
 
 if name == "main":
 asyncio.run(main())
+
