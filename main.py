@@ -32,14 +32,19 @@ async def start_handler(message: types.Message):
 
 @dp.message()
 async def ai_handler(message: types.Message):
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "system", "content": "Siz zukko AI repetitorsiz. O'zbek tilida javob bering."},
-            {"role": "user", "content": message.text},
-        ],
-    )
-    await message.answer(response.choices[0].message.content)
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": "Siz zukko AI repetitorsiz. O'zbek tilida javob bering."},
+                {"role": "user", "content": message.text},
+            ],
+        )
+        # Faqat javob muvaffaqiyatli bo'lsa xabar yuboramiz
+        await message.answer(response.choices[0].message.content)
+    except Exception as e:
+        print(f"Xato yuz berdi: {e}")
+        await message.answer("Hozircha javob bera olmayman, texnik nosozlik yuz berdi.")
 
 async def main():
     # Veb-serverni va botni bir vaqtda ishga tushiramiz
@@ -48,5 +53,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
