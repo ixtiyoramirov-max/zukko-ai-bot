@@ -30,7 +30,7 @@ messages=[
 {"role": "user", "content": message.text}
 ]
 )
-await message.answer(response.choices[0].message.content)
+ message.answer(response.choices[0].message.content)
 except Exception as e:
 print(f"Xato: {e}")
 await message.answer("Hozircha javob bera olmayman, texnik xato.")
@@ -47,6 +47,7 @@ await site.start()
 
 if name == "main":
 asyncio.run(main())
+
 
 
 
