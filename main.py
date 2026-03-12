@@ -10,12 +10,12 @@ API KALITLAR
 TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub90IR54Yw"
 GROQ_API_KEY = "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"
 
-Mijozlarni sozlash
+
 client = Groq(api_key=GROQ_API_KEY)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-Render uchun oddiy veb-server (Bot o'chib qolmasligi uchun)
+
 async def handle(request):
 return web.Response(text="Bot is live!")
 
@@ -51,4 +51,5 @@ await site.start()
 
 if name == "main":
 asyncio.run(main())
+
 
