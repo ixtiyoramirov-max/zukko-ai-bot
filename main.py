@@ -9,7 +9,7 @@ from aiohttp import web
 # Loglarni yoqish (xatoni ko'rish uchun)
 logging.basicConfig(level=logging.INFO)
 
-TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub90IR54Yw"
+TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub9OIR54Yw"
 GROQ_API_KEY = "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"
 
 client = Groq(api_key=GROQ_API_KEY)
@@ -58,3 +58,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.info("Bot to'xtatildi")
+
