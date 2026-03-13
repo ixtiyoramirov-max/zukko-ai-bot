@@ -1,9 +1,13 @@
 import os
 import asyncio
+import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from groq import Groq
 from aiohttp import web
+
+# Loglarni yoqish (xatoni ko'rish uchun)
+logging.basicConfig(level=logging.INFO)
 
 TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub90IR54Yw"
 GROQ_API_KEY = "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"
@@ -13,11 +17,11 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 async def handle(request):
-    return web.Response(text="Bot is live!")
+    return web.Response(text="Bot is running!")
 
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
-    await message.answer("Salom! Men Zukko AI repetitorman. Savolingizni bering! 🚀")
+    await message.answer("Salom! Men Zukko AI repetitorman. Nihoyat ishladim! 🚀")
 
 @dp.message()
 async def ai_handler(message: types.Message):
@@ -31,18 +35,26 @@ async def ai_handler(message: types.Message):
         )
         await message.answer(response.choices[0].message.content)
     except Exception as e:
+        logging.error(f"AI Xatosi: {e}")
         await message.answer(f"Texnik xato: {str(e)}")
 
 async def main():
+    # Render uchun portni ochish
     app = web.Application()
     app.router.add_get('/', handle)
     runner = web.AppRunner(app)
     await runner.setup()
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 10000))
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
+    
+    # Botni webhooksiz, toza ishga tushirish
+    logging.info("Bot ishga tushmoqda...")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logging.info("Bot to'xtatildi")
