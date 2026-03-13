@@ -1,61 +1,95 @@
 import os
 import asyncio
-import logging
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from groq import Groq
-from aiohttp import web
 
-# Loglarni yoqish (xatoni ko'rish uchun)
-logging.basicConfig(level=logging.INFO)
+# --- SOZLAMALAR ---
+BOT_TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub9OIR54Yw"
+GROQ_API_KEY = "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"
+CHANNELS = ["@zukko_ai_channel"]  # Kanalingiz username'ini @ bilan yozing
 
-TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub9OIR54Yw"
-GROQ_API_KEY = "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"
-
+# AI va Botni ishga tushirish
 client = Groq(api_key=GROQ_API_KEY)
-bot = Bot(token=TOKEN)
+bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-async def handle(request):
-    return web.Response(text="Bot is running!")
+# --- FUNKSIYALAR ---
 
+# Obunani tekshirish funksiyasi
+async def check_subscription(user_id):
+    for channel in CHANNELS:
+        try:
+            member = await bot.get_chat_member(chat_id=channel, user_id=user_id)
+            if member.status in ["left", "kicked"]:
+                return False
+        except Exception as e:
+            print(f"Xatolik yuz berdi: {e}")
+            return False
+    return True
+
+# Obuna tugmalarini yasash
+def get_sub_keyboard():
+    builder = InlineKeyboardBuilder()
+    for channel in CHANNELS:
+        builder.row(types.InlineKeyboardButton(
+            text="Kanalga a'zo bo'lish 📢", 
+            url=f"https://t.me/{channel.replace('@', '')}")
+        )
+    builder.row(types.InlineKeyboardButton(
+        text="Tasdiqlash ✅", 
+        callback_data="check_subs")
+    )
+    return builder.as_markup()
+
+# --- HANDLERLAR ---
+
+# /start komandasi
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
-    await message.answer("Salom! Men Zukko AI repetitorman. Nihoyat ishladim! 🚀")
-
-@dp.message()
-async def ai_handler(message: types.Message):
-    try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "Siz zukko AI repetitorsiz. O'zbek tilida javob bering."},
-                {"role": "user", "content": message.text}
-            ]
+    is_sub = await check_subscription(message.from_user.id)
+    if is_sub:
+        await message.answer(f"Assalomu alaykum {message.from_user.full_name}! Zukko AI yordamga tayyor. Savolingizni yozishingiz mumkin.")
+    else:
+        await message.answer(
+            "Botdan foydalanish uchun quyidagi kanalimizga obuna bo'ling:",
+            reply_markup=get_sub_keyboard()
         )
-        await message.answer(response.choices[0].message.content)
-    except Exception as e:
-        logging.error(f"AI Xatosi: {e}")
-        await message.answer(f"Texnik xato: {str(e)}")
 
+# Tasdiqlash tugmasi bosilganda
+@dp.callback_query(F.data == "check_subs")
+async def check_callback(callback: types.CallbackQuery):
+    is_sub = await check_subscription(callback.from_user.id)
+    if is_sub:
+        await callback.message.edit_text("Rahmat! Endi savolingizni yuborishingiz mumkin.")
+    else:
+        await callback.answer("Siz hali a'zo bo'lmadingiz! ❌", show_alert=True)
+
+# AI bilan muloqot qismi
+@dp.message()
+async def ai_message_handler(message: types.Message):
+    # Avval obunani tekshiramiz
+    is_sub = await check_subscription(message.from_user.id)
+    if not is_sub:
+        await message.answer("Botdan foydalanish uchun kanalga a'zo bo'ling!", reply_markup=get_sub_keyboard())
+        return
+
+    # Agar obuna bo'lgan bo'lsa, AI ga yuboramiz
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": message.text}],
+            model="mixtral-8x7b-32768", # Yoki boshqa model
+        )
+        await message.answer(chat_completion.choices[0].message.content)
+    except Exception as e:
+        await message.answer("Kechirasiz, AI bilan bog'lanishda xatolik yuz berdi.")
+        print(e)
+
+# --- ASOSIY ISHGA TUSHIRISH ---
 async def main():
-    # Render uchun portni ochish
-    app = web.Application()
-    app.router.add_get('/', handle)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    port = int(os.environ.get("PORT", 10000))
-    site = web.TCPSite(runner, '0.0.0.0', port)
-    await site.start()
-    
-    # Botni webhooksiz, toza ishga tushirish
-    logging.info("Bot ishga tushmoqda...")
-    await bot.delete_webhook(drop_pending_updates=True)
+    print("Bot ishga tushdi...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logging.info("Bot to'xtatildi")
-
+    asyncio.run(main())
