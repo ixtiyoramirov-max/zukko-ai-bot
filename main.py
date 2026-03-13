@@ -23,7 +23,7 @@ async def start_handler(message: types.Message):
 async def ai_handler(message: types.Message):
     try:
         response = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "Siz zukko AI repetitorsiz. O'zbek tilida javob bering."},
                 {"role": "user", "content": message.text}
@@ -48,4 +48,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
