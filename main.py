@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from groq import Groq
 from aiohttp import web
 
-TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub90IR54Yw"
+TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub9OIR54Yw"
 GROQ_API_KEY = "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"
 
 client = Groq(api_key=GROQ_API_KEY)
@@ -48,3 +48,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
