@@ -63,9 +63,10 @@ async def ai_message_handler(message: types.Message):
 
     # Try-except'ni olib tashladik, endi xato bo'lsa Logs'da ko'rinadi
     completion = client.chat.completions.create(
-        messages=[{"role": "user", "content": message.text}],
-        model="mixtral-8x7b-32768",
-    )
+            messages=[{"role": "user", "content": message.text}],
+            model="llama-3.3-70b-versatile", # BU YANGI VA ISHLAYDIGAN MODEL
+        )
+            
     await message.answer(completion.choices[0].message.content)
 
 # --- ISHGA TUSHIRISH ---
