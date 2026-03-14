@@ -7,27 +7,27 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from groq import Groq
 from aiohttp import web
 
-# --- SOZLAMALAR (Environment Variables) ---
+# --- SOZLAMALAR ---
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-CHANNELS = ["@zukko_ai_channel"] # Kanalingiz nomini tekshiring
+CHANNELS = ["@zukko_ai_channel"] # Kanal manzilingizni tekshiring
 
 # AI va Botni ishga tushirish
 client = Groq(api_key=GROQ_API_KEY)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# Foydalanuvchilar xotirasi (Suhbat tarixini saqlash uchun)
+# Foydalanuvchilar suhbat tarixi (Xotira)
 user_history = {}
 
-# --- SOXTA SERVER (Render uyg'oq turishi uchun) ---
+# --- RENDER UCHUN PORT VA SERVER ---
 async def handle(request):
     return web.Response(text="Bot is running!")
 
 app = web.Application()
 app.router.add_get("/", handle)
 
-# --- BOT FUNKSIYALARI ---
+# --- OBUNANI TEKSHIRISH ---
 async def check_subscription(user_id):
     for channel in CHANNELS:
         try:
@@ -45,10 +45,11 @@ def get_sub_keyboard():
     builder.row(types.InlineKeyboardButton(text="Tasdiqlash ✅", callback_data="check_subs"))
     return builder.as_markup()
 
+# --- COMMAND HANDLERS ---
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
     if await check_subscription(message.from_user.id):
-        await message.answer(f"Assalomu alaykum {message.from_user.first_name}! Men Zukko AI botiman. Menga istalgan savolingizni bering.")
+        await message.answer(f"Assalomu alaykum {message.from_user.first_name}! Men Zukko AI botiman. Savolingizni bering.")
     else:
         await message.answer("Botdan foydalanish uchun kanalga a'zo bo'ling:", reply_markup=get_sub_keyboard())
 
@@ -59,61 +60,61 @@ async def check_callback(callback: types.CallbackQuery):
     else:
         await callback.answer("Siz hali a'zo bo'lmadingiz! ❌", show_alert=True)
 
-# --- AI XABAR ISHLOVCHISI (Xotira bilan) ---
+# --- ASOSIY AI MANTIQI ---
 @dp.message()
 async def ai_message_handler(message: types.Message):
-    # Obunani tekshirish
+    # 1. Obunani tekshirish
     if not await check_subscription(message.from_user.id):
-        await message.answer("Kanalga a'zo bo'ling!", reply_markup=get_sub_keyboard())
+        await message.answer("Botdan foydalanish uchun kanalga a'zo bo'ling!", reply_markup=get_sub_keyboard())
         return
 
     user_id = message.from_user.id
     
-    # Xotirani tayyorlash
+    # 2. Xotirani shakllantirish
     if user_id not in user_history:
         user_history[user_id] = [
-            {"role": "system", "content": "Siz aqlli va yordam beruvchi Zukko AI yordamchisisiz. O'zbek tilida javob berasiz."}
+            {"role": "system", "content": "Siz Zukko AI yordamchisisiz. O'zbek tilida aniq va aqlli javob berasiz."}
         ]
 
-    # Foydalanuvchi xabarini xotiraga qo'shish
+    # Foydalanuvchi xabarini qo'shish
     user_history[user_id].append({"role": "user", "content": message.text})
 
-    # Xotirani limitlash (Oxirgi 12 ta xabar: 6 ta savol-javob juftligi)
+    # 3. Xotirani limitlash (12 ta xabar)
     if len(user_history[user_id]) > 12:
         user_history[user_id] = [user_history[user_id][0]] + user_history[user_id][-11:]
 
-    # "Yozmoqda..." statusini yuborish
+    # 4. Typing status yuborish
     await bot.send_chat_action(chat_id=message.chat.id, action="typing")
- try:
-         completion = client.chat.completions.create(
-             messages=user_history[user_id],
-             model="llama-3.3-70b-versatile",
-         )
+
+    # 5. Groq AI ga so'rov yuborish
+    try:
+        completion = client.chat.completions.create(
+            messages=user_history[user_id],
+            model="llama-3.3-70b-versatile",
+        )
         
-         ai_response = completion.choices[0].message.content
+        ai_response = completion.choices[0].message.content
         
-         # AI javobini xotiraga qo'shish
-         user_history[user_id].append({"role": "assistant", "content": ai_response})
+        # Javobni xotiraga saqlash
+        user_history[user_id].append({"role": "assistant", "content": ai_response})
         
-   await message.answer(ai_response, parse_mode="Markdown")
+        # Javobni yuborish
+        await message.answer(ai_response, parse_mode="Markdown")
         
- except Exception as e:
-        print(f"Xatolik tafsiloti: {e}")
-        await message.answer(f"Xato yuz berdi: {e}")    
-    
-        
-        
+    except Exception as e:
+        print(f"Xatolik yuz berdi: {e}")
+        await message.answer(f"⚠️ Xato: AI bilan bog'lanib bo'lmadi. (Tafsilot: {e})")
 
 # --- ISHGA TUSHIRISH ---
 async def main():
-    # Portni ochish
+    # Render porti
     port = int(os.environ.get("PORT", 10000))
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
     
-    print(f"Server {port}-portda ishga tushdi")
+    print(f"Server {port}-portda ishlamoqda...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
