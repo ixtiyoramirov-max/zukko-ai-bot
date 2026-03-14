@@ -98,9 +98,12 @@ async def ai_message_handler(message: types.Message):
         
         await message.answer(ai_response, parse_mode="Markdown")
         
-    except Exception as e:
-        print(f"Xatolik: {e}")
-        await message.answer("Kechirasiz, hozirda javob bera olmayman. Birozdan so'ng urinib ko'ring.")
+        except Exception as e:
+        print(f"Xatolik tafsiloti: {e}") # Bu Logs oynasida ko'rinadi
+        await message.answer(f"Xato yuz berdi: {e}") # Bu Telegram'da senga ko'rinadi
+    
+        
+        
 
 # --- ISHGA TUSHIRISH ---
 async def main():
