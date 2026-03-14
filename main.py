@@ -60,14 +60,13 @@ async def ai_message_handler(message: types.Message):
     if not await check_subscription(message.from_user.id):
         await message.answer("Kanalga a'zo bo'ling!", reply_markup=get_sub_keyboard())
         return
-    try:
-        completion = client.chat.completions.create(
-            messages=[{"role": "user", "content": message.text}],
-            model="mixtral-8x7b-32768",
-        )
-        await message.answer(completion.choices[0].message.content)
-    except Exception:
-        await message.answer("Xatolik yuz berdi.")
+
+    # Try-except'ni olib tashladik, endi xato bo'lsa Logs'da ko'rinadi
+    completion = client.chat.completions.create(
+        messages=[{"role": "user", "content": message.text}],
+        model="mixtral-8x7b-32768",
+    )
+    await message.answer(completion.choices[0].message.content)
 
 # --- ISHGA TUSHIRISH ---
 async def main():
