@@ -1,4 +1,5 @@
 import os
+import aiohttp
 import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
@@ -19,7 +20,19 @@ dp = Dispatcher()
 # --- SOXTA SERVER (Render uchun) ---
 async def handle(request):
     return web.Response(text="Bot is running!")
-
+async def self_ping():
+    # O'zining Render'dagi URL manzilini yoz
+    url = "https://zukko-ai-bot.onrender.com" 
+    while True:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    print(f"Self-ping status: {response.status}")
+        except Exception as e:
+            print(f"Self-ping error: {e}")
+        
+        # 10 daqiqa (600 soniya) kutish
+        await asyncio.sleep(600)
 app = web.Application()
 app.router.add_get("/", handle)
 
@@ -77,6 +90,12 @@ async def main():
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
+    
+    # Self-pingni fonda ishga tushirish
+    asyncio.create_task(self_ping())
+    
+    print(f"Server {port}-portda ishga tushdi")
+    await dp.start_polling(bot)
     
     print(f"Server {port}-portda ishga tushdi")
     await dp.start_polling(bot)
