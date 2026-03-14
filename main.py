@@ -97,9 +97,9 @@ try:
         
         await message.answer(ai_response, parse_mode="Markdown")
         
-    except Exception as e:
+except Exception as e:
         print(f"Xatolik tafsiloti: {e}")
-        await message.answer(f"Xato yuz berdi: {e}")
+        await message.answer(f"Xato yuz berdi: {e}")    
     
         
         
