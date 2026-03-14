@@ -84,20 +84,20 @@ async def ai_message_handler(message: types.Message):
 
     # "Yozmoqda..." statusini yuborish
     await bot.send_chat_action(chat_id=message.chat.id, action="typing")
-try:
-        completion = client.chat.completions.create(
-            messages=user_history[user_id],
-            model="llama-3.3-70b-versatile",
-        )
+ try:
+         completion = client.chat.completions.create(
+             messages=user_history[user_id],
+             model="llama-3.3-70b-versatile",
+         )
         
-        ai_response = completion.choices[0].message.content
+         ai_response = completion.choices[0].message.content
         
-        # AI javobini xotiraga qo'shish
-        user_history[user_id].append({"role": "assistant", "content": ai_response})
+         # AI javobini xotiraga qo'shish
+         user_history[user_id].append({"role": "assistant", "content": ai_response})
         
-        await message.answer(ai_response, parse_mode="Markdown")
+         await message.answer(ai_response, parse_mode="Markdown")
         
-except Exception as e:
+ except Exception as e:
         print(f"Xatolik tafsiloti: {e}")
         await message.answer(f"Xato yuz berdi: {e}")    
     
