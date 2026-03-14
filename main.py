@@ -95,7 +95,7 @@ async def ai_message_handler(message: types.Message):
          # AI javobini xotiraga qo'shish
          user_history[user_id].append({"role": "assistant", "content": ai_response})
         
-         await message.answer(ai_response, parse_mode="Markdown")
+   await message.answer(ai_response, parse_mode="Markdown")
         
  except Exception as e:
         print(f"Xatolik tafsiloti: {e}")
