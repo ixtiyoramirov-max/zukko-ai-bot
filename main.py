@@ -84,8 +84,7 @@ async def ai_message_handler(message: types.Message):
 
     # "Yozmoqda..." statusini yuborish
     await bot.send_chat_action(chat_id=message.chat.id, action="typing")
-
-    try:
+try:
         completion = client.chat.completions.create(
             messages=user_history[user_id],
             model="llama-3.3-70b-versatile",
@@ -98,9 +97,9 @@ async def ai_message_handler(message: types.Message):
         
         await message.answer(ai_response, parse_mode="Markdown")
         
-        except Exception as e:
-        print(f"Xatolik tafsiloti: {e}") # Bu Logs oynasida ko'rinadi
-        await message.answer(f"Xato yuz berdi: {e}") # Bu Telegram'da senga ko'rinadi
+    except Exception as e:
+        print(f"Xatolik tafsiloti: {e}")
+        await message.answer(f"Xato yuz berdi: {e}")
     
         
         
