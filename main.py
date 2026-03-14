@@ -8,7 +8,7 @@ from aiohttp import web  # Port ochish uchun kerak
 
 # --- SOZLAMALAR ---
 BOT_TOKEN = "8792863121:AAGDQ_HBjbpXfOkzTUicj6TtPub9OIR54Yw"
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
 CHANNELS = ["@zukko_ai_channel"] 
 
 # AI va Botni ishga tushirish
