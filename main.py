@@ -118,9 +118,16 @@ async def draw_image_handler(message: types.Message):
     await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
 
     try:
-        # Pollinations API orqali rasm yaratish (bepul va tez)
-        encoded_prompt = prompt.replace(" ", "%20")
-        image_url = f"https://pollinations.ai/p/{encoded_prompt}?width=1024&height=1024&seed=42"
+        # Promptni ingliz tiliga yaqinlashtirish va xavfsiz formatga keltirish
+        import urllib.parse
+        safe_prompt = urllib.parse.quote(prompt)
+        
+        # Yangilangan ishonchli URL format
+        image_url = f"https://image.pollinations.ai/prompt/{safe_prompt}?width=1024&height=1024&nologo=true"
+        
+        await message.answer_photo(photo=image_url, caption=f"Siz so'ragan rasm: '{prompt}'")
+        
+        
         
         await message.answer_photo(photo=image_url, caption=f"Siz so'ragan rasm: '{prompt}'")
         
